@@ -1,0 +1,15 @@
+{
+  "name": "compuscore",
+  "version": "1.0.0",
+  "description": "ScholarDesk monorepo root",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names \"CLIENT,SERVER\" --prefix-colors \"cyan.bold,magenta.bold\" --prefix \"[{name}]\" --timestamp-format \"HH:mm:ss\" --kill-others-on-fail \"pnpm --filter client dev\" \"pnpm --filter server dev\"",
+    "dev:client": "pnpm --filter client dev",
+    "dev:server": "pnpm --filter server dev",
+    "build": "concurrently --names \"CLIENT,SERVER\" --prefix-colors \"cyan.bold,magenta.bold\" --prefix \"[{name}]\" \"pnpm --filter client build\" \"pnpm --filter server build\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
