@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import { z, ZodError } from 'zod';
+import { ZodError } from 'zod';
 import { env } from '../config/env';
 import { AppError } from '../utils/AppError';
 
@@ -30,7 +30,7 @@ export function errorHandler(
     res.status(400).json({
       success: false,
       message: 'Validation failed',
-      errors: z.flattenError(err).fieldErrors,
+      errors: err.flatten().fieldErrors,
     });
     return;
   }

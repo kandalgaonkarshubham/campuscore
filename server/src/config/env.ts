@@ -8,7 +8,7 @@ const envSchema = z.object({
   COOKIE_NAME: z.string().default('scholardesk_token'),
   ADMIN_USERNAME: z.string().default('admin'),
   ADMIN_PASSWORD: z.string().default('admin123'),
-  CLIENT_URL: z.url().default(new URL('http://localhost:5173').toString()),
+  CLIENT_URL: z.string().url().default('http://localhost:5173'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   UPLOAD_DIR: z.string().default('uploads'),
   MAX_FILE_SIZE_MB: z.coerce.number().default(5),
@@ -20,7 +20,7 @@ function loadEnv(): Env {
   const result = envSchema.safeParse(process.env);
 
   if (!result.success) {
-    console.error('Invalid environment variables:', z.flattenError(result.error).fieldErrors);
+    console.error('Invalid environment variables:', result.error.flatten().fieldErrors);
     process.exit(1);
   }
 
