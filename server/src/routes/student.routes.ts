@@ -4,6 +4,8 @@ import {
   createStudent,
   deleteStudent,
   getStudent,
+  getStudentsMeta,
+  listStudents,
   updateStudent,
 } from '../controllers/student.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
@@ -28,6 +30,12 @@ function withOptionalPhoto(
 }
 
 router.post('/', withOptionalPhoto(createStudent));
+router.get('/meta', (req, res, next) => {
+  getStudentsMeta(req, res).catch(next);
+});
+router.get('/', (req, res, next) => {
+  listStudents(req, res).catch(next);
+});
 router.get('/:id', (req, res, next) => {
   getStudent(req, res).catch(next);
 });

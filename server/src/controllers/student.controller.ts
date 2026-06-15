@@ -1,4 +1,4 @@
-import { eq, ne, and } from 'drizzle-orm';
+import { and, count, desc, eq, ilike, ne, type SQL } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db } from '../db';
 import { students } from '../db/schema';
@@ -7,6 +7,7 @@ import {
   parseDob,
   updateStudentSchema,
 } from '../schemas/student.schema';
+import { listStudentsQuerySchema } from '../schemas/studentList.schema';
 import { logActivity } from '../services/activityLog.service';
 import { generateAdmissionNumber } from '../services/admissionNumber.service';
 import { AppError } from '../utils/AppError';
@@ -25,12 +26,87 @@ async function assertUniqueEmail(email: string, excludeId?: number): Promise<voi
   }
 }
 
-function parseStudentId(id: string): number {
-  const studentId = Number(id);
+function parseStudentId(id: string | string[]): number {
+  const raw = Array.isArray(id) ? id[0] : id;
+  const studentId = Number(raw);
   if (!Number.isInteger(studentId) || studentId <= 0) {
     throw new AppError('Invalid student id', 400);
   }
   return studentId;
+}
+
+function buildListFilters(query: ReturnType<typeof listStudentsQuerySchema.parse>): SQL | undefined {
+  const conditions: SQL[] = [];
+
+  if (query.search) {
+    conditions.push(ilike(students.name, `%${query.search}%`));
+  }
+  if (query.course) {
+    conditions.push(eq(students.course, query.course));
+  }
+  if (query.year !== undefined) {
+    conditions.push(eq(students.year, query.year));
+  }
+  if (query.gender) {
+    conditions.push(eq(students.gender, query.gender));
+  }
+
+  return conditions.length > 0 ? and(...conditions) : undefined;
+}
+
+export async function listStudents(req: Request, res: Response): Promise<void> {
+  const query = listStudentsQuerySchema.parse(req.query);
+  const where = buildListFilters(query);
+  const offset = (query.page - 1) * query.limit;
+
+  const [countResult] = await db
+    .select({ total: count() })
+    .from(students)
+    .where(where);
+
+  const total = countResult?.total ?? 0;
+  const totalPages = total === 0 ? 0 : Math.ceil(total / query.limit);
+
+  const rows = await db
+    .select()
+    .from(students)
+    .where(where)
+    .orderBy(desc(students.createdAt))
+    .limit(query.limit)
+    .offset(offset);
+
+  res.json({
+    success: true,
+    message: 'Students fetched successfully',
+    data: rows.map(formatStudent),
+    pagination: {
+      page: query.page,
+      limit: query.limit,
+      total,
+      totalPages,
+    },
+  });
+}
+
+export async function getStudentsMeta(_req: Request, res: Response): Promise<void> {
+  const courseRows = await db
+    .selectDistinct({ course: students.course })
+    .from(students)
+    .orderBy(students.course);
+
+  const yearRows = await db
+    .selectDistinct({ year: students.year })
+    .from(students)
+    .orderBy(students.year);
+
+  res.json({
+    success: true,
+    message: 'Student filters fetched successfully',
+    data: {
+      courses: courseRows.map((row) => row.course),
+      years: yearRows.map((row) => row.year),
+    },
+  });
 }
 
 export async function createStudent(req: Request, res: Response): Promise<void> {

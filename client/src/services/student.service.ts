@@ -1,6 +1,32 @@
 import type { Student, StudentFormData } from '../schemas/student.schema';
 import api from './api';
 
+export interface StudentListParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  course?: string;
+  year?: number;
+  gender?: string;
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface StudentListResponse {
+  data: Student[];
+  pagination: PaginationMeta;
+}
+
+export interface StudentsMeta {
+  courses: string[];
+  years: number[];
+}
+
 function buildFormData(data: StudentFormData, photo: File): FormData {
   const form = new FormData();
   form.append('name', data.name);
@@ -13,6 +39,19 @@ function buildFormData(data: StudentFormData, photo: File): FormData {
   form.append('address', data.address);
   form.append('photo', photo);
   return form;
+}
+
+export async function listStudents(params: StudentListParams): Promise<StudentListResponse> {
+  const res = await api.get('/students', { params });
+  return {
+    data: res.data.data,
+    pagination: res.data.pagination,
+  };
+}
+
+export async function getStudentsMeta(): Promise<StudentsMeta> {
+  const res = await api.get('/students/meta');
+  return res.data.data;
 }
 
 export async function createStudent(data: StudentFormData, photo?: File): Promise<Student> {
