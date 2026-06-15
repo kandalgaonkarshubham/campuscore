@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import multer from 'multer';
 import { ZodError } from 'zod';
 import { env } from '../config/env';
 import { AppError } from '../utils/AppError';
@@ -23,6 +24,20 @@ export function errorHandler(
       success: false,
       message: err.message,
     });
+    return;
+  }
+
+  if (err instanceof multer.MulterError) {
+    const message =
+      err.code === 'LIMIT_FILE_SIZE'
+        ? `File too large. Maximum size is ${env.MAX_FILE_SIZE_MB}MB`
+        : err.message;
+    res.status(400).json({ success: false, message });
+    return;
+  }
+
+  if (err instanceof Error && err.message === 'Only JPEG, PNG, and WebP images are allowed') {
+    res.status(400).json({ success: false, message: err.message });
     return;
   }
 

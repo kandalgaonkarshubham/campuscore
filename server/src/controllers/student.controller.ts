@@ -10,6 +10,7 @@ import {
 import { logActivity } from '../services/activityLog.service';
 import { generateAdmissionNumber } from '../services/admissionNumber.service';
 import { AppError } from '../utils/AppError';
+import { deletePhotoFile, toPhotoUrl } from '../utils/photo';
 import { formatStudent, getChangedFields, studentSnapshot } from '../utils/student';
 
 async function assertUniqueEmail(email: string, excludeId?: number): Promise<void> {
@@ -37,6 +38,7 @@ export async function createStudent(req: Request, res: Response): Promise<void> 
   await assertUniqueEmail(input.email);
 
   const admissionNumber = await generateAdmissionNumber(db);
+  const photoUrl = req.file ? toPhotoUrl(req.file.filename) : null;
 
   const [student] = await db
     .insert(students)
@@ -50,6 +52,7 @@ export async function createStudent(req: Request, res: Response): Promise<void> 
       mobile: input.mobile,
       gender: input.gender,
       address: input.address,
+      photoUrl,
     })
     .returning();
 
@@ -101,6 +104,8 @@ export async function updateStudent(req: Request, res: Response): Promise<void> 
 
   await assertUniqueEmail(input.email, studentId);
 
+  const photoUrl = req.file ? toPhotoUrl(req.file.filename) : existing.photoUrl;
+
   const [updated] = await db
     .update(students)
     .set({
@@ -112,10 +117,15 @@ export async function updateStudent(req: Request, res: Response): Promise<void> 
       mobile: input.mobile,
       gender: input.gender,
       address: input.address,
+      photoUrl,
       updatedAt: new Date(),
     })
     .where(eq(students.id, studentId))
     .returning();
+
+  if (req.file && existing.photoUrl && existing.photoUrl !== photoUrl) {
+    deletePhotoFile(existing.photoUrl);
+  }
 
   await logActivity('UPDATED', updated.id, {
     changedFields: getChangedFields(existing, updated),
@@ -143,6 +153,7 @@ export async function deleteStudent(req: Request, res: Response): Promise<void> 
   }
 
   await db.delete(students).where(eq(students.id, studentId));
+  deletePhotoFile(existing.photoUrl);
 
   await logActivity('DELETED', null, {
     changedFields: [],

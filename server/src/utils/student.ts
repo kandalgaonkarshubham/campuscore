@@ -44,6 +44,7 @@ const TRACKED_FIELDS = [
   'mobile',
   'gender',
   'address',
+  'photoUrl',
 ] as const;
 
 export function getChangedFields(
