@@ -4,6 +4,9 @@ import { AuthProvider } from './contexts/AuthContext';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import PlaceholderPage from './pages/PlaceholderPage';
+import StudentDetailPage from './pages/StudentDetailPage';
+import StudentFormPage from './pages/StudentFormPage';
+import StudentsPage from './pages/StudentsPage';
 
 function App() {
   return (
@@ -15,8 +18,10 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/students" element={<PlaceholderPage title="Students" />} />
-            <Route path="/students/new" element={<PlaceholderPage title="Add Student" />} />
+            <Route path="/students" element={<StudentsPage />} />
+            <Route path="/students/new" element={<StudentFormPage />} />
+            <Route path="/students/:id/edit" element={<StudentFormPage />} />
+            <Route path="/students/:id" element={<StudentDetailPage />} />
           </Route>
 
           <Route path="*" element={<PlaceholderPage title="Not Found" />} />
