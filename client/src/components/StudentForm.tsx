@@ -1,11 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { resolveUploadUrl } from '../lib/urls';
 import { studentSchema, type Student, type StudentFormData } from '../schemas/student.schema';
+
+const MAX_FILE_SIZE_MB = 5;
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 interface StudentFormProps {
   initialData?: Student;
-  onSubmit: (data: StudentFormData) => Promise<void>;
+  onSubmit: (data: StudentFormData, photo?: File) => Promise<void>;
   submitLabel: string;
 }
 
@@ -28,8 +32,24 @@ function getErrorMessage(error: unknown): string {
   return 'Something went wrong. Please try again.';
 }
 
+function validatePhoto(file: File): string | null {
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+    return 'Only JPEG, PNG, and WebP images are allowed';
+  }
+  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+    return `File must be under ${MAX_FILE_SIZE_MB}MB`;
+  }
+  return null;
+}
+
 export default function StudentForm({ initialData, onSubmit, submitLabel }: StudentFormProps) {
   const [serverError, setServerError] = useState('');
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [photoError, setPhotoError] = useState('');
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    resolveUploadUrl(initialData?.photoUrl ?? null),
+  );
+
   const {
     register,
     handleSubmit,
@@ -59,10 +79,41 @@ export default function StudentForm({ initialData, onSubmit, submitLabel }: Stud
         },
   });
 
+  useEffect(() => {
+    if (!photo) return;
+
+    const objectUrl = URL.createObjectURL(photo);
+    setPreviewUrl(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [photo]);
+
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    setPhotoError('');
+
+    if (!file) {
+      setPhoto(null);
+      setPreviewUrl(resolveUploadUrl(initialData?.photoUrl ?? null));
+      return;
+    }
+
+    const validationError = validatePhoto(file);
+    if (validationError) {
+      setPhoto(null);
+      setPhotoError(validationError);
+      setPreviewUrl(resolveUploadUrl(initialData?.photoUrl ?? null));
+      event.target.value = '';
+      return;
+    }
+
+    setPhoto(file);
+  };
+
   const handleFormSubmit = async (data: StudentFormData) => {
     setServerError('');
     try {
-      await onSubmit(data);
+      await onSubmit(data, photo ?? undefined);
     } catch (error) {
       setServerError(getErrorMessage(error));
     }
@@ -78,6 +129,28 @@ export default function StudentForm({ initialData, onSubmit, submitLabel }: Stud
           </p>
         </div>
       )}
+
+      <div>
+        <label htmlFor="photo" className="block text-sm font-medium text-slate-700">
+          Student Photo
+        </label>
+        <input
+          id="photo"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handlePhotoChange}
+          className="mt-1 block w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
+        />
+        <p className="mt-1 text-xs text-slate-500">JPEG, PNG, or WebP. Max {MAX_FILE_SIZE_MB}MB.</p>
+        {photoError && <p className="mt-1 text-xs text-red-600">{photoError}</p>}
+        {previewUrl && (
+          <img
+            src={previewUrl}
+            alt="Student preview"
+            className="mt-3 h-32 w-32 rounded-lg border border-slate-200 object-cover"
+          />
+        )}
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">

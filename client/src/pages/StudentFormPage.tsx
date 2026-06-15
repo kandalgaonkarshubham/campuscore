@@ -33,14 +33,14 @@ export default function StudentFormPage() {
       .finally(() => setIsLoading(false));
   }, [id]);
 
-  const handleSubmit = async (data: StudentFormData) => {
+  const handleSubmit = async (data: StudentFormData, photo?: File) => {
     if (isEdit && id) {
-      const updated = await updateStudent(Number(id), data);
+      const updated = await updateStudent(Number(id), data, photo);
       navigate(`/students/${updated.id}`);
       return;
     }
 
-    const created = await createStudent(data);
+    const created = await createStudent(data, photo);
     navigate(`/students/${created.id}`);
   };
 

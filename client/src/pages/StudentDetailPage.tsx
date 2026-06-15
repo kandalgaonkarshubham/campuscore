@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
+import { resolveUploadUrl } from '../lib/urls';
 import type { Student } from '../schemas/student.schema';
 import { deleteStudent, getStudent } from '../services/student.service';
 
@@ -59,9 +60,18 @@ export default function StudentDetailPage() {
         {student && (
           <>
             <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <h1 className="text-2xl font-semibold text-slate-900">{student.name}</h1>
-                <p className="mt-1 text-sm text-slate-500">{student.admissionNumber}</p>
+              <div className="flex items-start gap-4">
+                {student.photoUrl && (
+                  <img
+                    src={resolveUploadUrl(student.photoUrl) ?? undefined}
+                    alt={student.name}
+                    className="h-24 w-24 rounded-lg border border-slate-200 object-cover"
+                  />
+                )}
+                <div>
+                  <h1 className="text-2xl font-semibold text-slate-900">{student.name}</h1>
+                  <p className="mt-1 text-sm text-slate-500">{student.admissionNumber}</p>
+                </div>
               </div>
               <div className="flex gap-3">
                 <Link
