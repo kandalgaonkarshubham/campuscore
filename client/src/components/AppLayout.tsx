@@ -18,7 +18,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
           <nav className="flex items-center gap-6">
             <NavLink to="/dashboard" className="text-lg font-semibold text-slate-900">
-              Compuscore
+              Campuscore
             </NavLink>
             <NavLink to="/dashboard" className={navLinkClass}>
               Dashboard

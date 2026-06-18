@@ -1,7 +1,7 @@
 {
-  "name": "compuscore",
+  "name": "campuscore",
   "version": "1.0.0",
-  "description": "Compuscore — student management system",
+  "description": "Campuscore — student management system",
   "private": true,
   "scripts": {
     "dev": "concurrently --names \"CLIENT,SERVER\" --prefix-colors \"cyan.bold,magenta.bold\" --prefix \"[{name}]\" --timestamp-format \"HH:mm:ss\" --kill-others-on-fail \"pnpm --filter client dev\" \"pnpm --filter server dev\"",

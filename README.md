@@ -1,4 +1,4 @@
-# Compuscore
+# Campuscore
 
 Student management app — login, CRUD, photo uploads, search/filter, dashboard charts, activity log.
 
@@ -42,7 +42,7 @@ pnpm dev
 |----------|-------|
 | `DATABASE_URL` | Postgres connection string |
 | `JWT_SECRET` | Signing secret |
-| `COOKIE_NAME` | Default `compuscore_token` |
+| `COOKIE_NAME` | Default `campuscore_token` |
 | `CLIENT_URL` | Frontend origin for CORS |
 | `UPLOAD_STORAGE` | `local` (dev) or `vercel-blob` (prod) |
 | `BLOB_READ_WRITE_TOKEN` | Required when using vercel-blob |
