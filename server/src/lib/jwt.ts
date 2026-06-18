@@ -1,17 +1,28 @@
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 import { env } from '../config/env';
 
-export interface JwtPayload {
+export interface TokenPayload {
   sub: number;
   username: string;
 }
 
-export function signToken(payload: JwtPayload): string {
-  return jwt.sign(payload, env.JWT_SECRET, { expiresIn: env.JWT_EXPIRES_IN });
+export function signToken(payload: TokenPayload): string {
+  const options: SignOptions = { expiresIn: env.JWT_EXPIRES_IN as SignOptions['expiresIn'] };
+  return jwt.sign(payload, env.JWT_SECRET, options);
 }
 
-export function verifyToken(token: string): JwtPayload {
-  return jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+export function verifyToken(token: string): TokenPayload {
+  const decoded = jwt.verify(token, env.JWT_SECRET);
+  if (typeof decoded === 'string') {
+    throw new Error('Invalid token');
+  }
+
+  const { sub, username } = decoded;
+  if (typeof sub !== 'number' || typeof username !== 'string') {
+    throw new Error('Invalid token');
+  }
+
+  return { sub, username };
 }
 
 const EXPIRY_MULTIPLIERS: Record<string, number> = {
