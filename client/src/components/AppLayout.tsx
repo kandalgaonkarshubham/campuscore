@@ -31,7 +31,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </NavLink>
           </nav>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-600">{user?.username}</span>
+            {/* <span className="text-sm text-slate-600">{user?.username}</span> */}
             <button
               type="button"
               onClick={() => logout()}
