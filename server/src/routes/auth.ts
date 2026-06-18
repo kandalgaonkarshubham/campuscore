@@ -1,12 +1,11 @@
-import { Router, type NextFunction, type Request, type Response } from 'express';
+import { Router } from 'express';
 import { login, logout, me } from '../handlers/auth';
 import { requireAuth } from '../middleware/auth';
+import { toRequestHandler } from '../lib/http';
 
 const router = Router();
 
-router.post('/login', (req: Request, res: Response, next: NextFunction) => {
-  login(req, res).catch(next);
-});
+router.post('/login', toRequestHandler(login));
 
 router.post('/logout', logout);
 router.get('/me', requireAuth, me);

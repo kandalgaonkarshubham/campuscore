@@ -1,8 +1,13 @@
-import type { CookieOptions } from 'express';
 import { env } from '../config/env';
 import { jwtExpiryToMs } from './jwt';
 
-export function authCookieOptions(): CookieOptions {
+export function authCookieOptions(): {
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: 'lax';
+  maxAge: number;
+  path: string;
+} {
   return {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',

@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { del, put } from '@vercel/blob';
 import { env } from '../config/env';
+import type { UploadedFile } from '../types/http';
 
 function getUploadDir(): string {
   return path.resolve(process.cwd(), env.UPLOAD_DIR);
@@ -25,7 +26,7 @@ export function isLocalUploadStorage(): boolean {
   return !useBlobStorage();
 }
 
-export async function storeUploadedPhoto(file: Express.Multer.File): Promise<string> {
+export async function storeUploadedPhoto(file: UploadedFile): Promise<string> {
   if (useBlobStorage()) {
     const pathname = `students/${generateFilename(file.originalname)}`;
     const blob = await put(pathname, file.buffer, {

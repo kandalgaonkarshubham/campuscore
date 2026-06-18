@@ -1,8 +1,8 @@
 import { count, desc } from 'drizzle-orm';
-import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { db } from '../db';
 import { activityLogs } from '../db/schema';
+import type { AppRequest, AppResponse } from '../types/http';
 
 const listQuery = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -26,7 +26,7 @@ function formatLog(log: typeof activityLogs.$inferSelect) {
   };
 }
 
-export async function listLogs(req: Request, res: Response): Promise<void> {
+export async function listLogs(req: AppRequest, res: AppResponse): Promise<void> {
   const query = listQuery.parse(req.query);
   const offset = (query.page - 1) * query.limit;
 

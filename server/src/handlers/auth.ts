@@ -1,6 +1,5 @@
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
-import type { Request, Response } from 'express';
 import { env } from '../config/env';
 import { db } from '../db';
 import { adminUsers } from '../db/schema';
@@ -8,8 +7,9 @@ import { AppError } from '../lib/AppError';
 import { authCookieOptions } from '../lib/cookies';
 import { signToken } from '../lib/jwt';
 import { loginSchema } from '../validators/auth';
+import type { AppRequest, AppResponse } from '../types/http';
 
-export async function login(req: Request, res: Response): Promise<void> {
+export async function login(req: AppRequest, res: AppResponse): Promise<void> {
   const { username, password } = loginSchema.parse(req.body);
 
   const [admin] = await db
@@ -37,9 +37,9 @@ export async function login(req: Request, res: Response): Promise<void> {
   });
 }
 
-export function logout(_req: Request, res: Response): void {
-  const { maxAge: _maxAge, ...clearOptions } = authCookieOptions();
-  res.clearCookie(env.COOKIE_NAME, clearOptions);
+export function logout(_req: AppRequest, res: AppResponse): void {
+  const clearOptions = authCookieOptions();
+  res.clearCookie(env.COOKIE_NAME, { ...clearOptions, maxAge: undefined });
 
   res.json({
     success: true,
@@ -47,7 +47,7 @@ export function logout(_req: Request, res: Response): void {
   });
 }
 
-export function me(req: Request, res: Response): void {
+export function me(req: AppRequest, res: AppResponse): void {
   if (!req.user) {
     throw new AppError('Authentication required', 401);
   }

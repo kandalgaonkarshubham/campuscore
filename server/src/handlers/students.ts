@@ -1,5 +1,4 @@
 import { and, count, desc, eq, ilike, ne, type SQL } from 'drizzle-orm';
-import type { Request, Response } from 'express';
 import { db } from '../db';
 import { students } from '../db/schema';
 import { logActivity } from '../lib/activity';
@@ -13,6 +12,7 @@ import {
   updateStudentSchema,
 } from '../validators/student';
 import { listStudentsQuerySchema } from '../validators/students-query';
+import type { AppRequest, AppResponse } from '../types/http';
 
 async function assertUniqueEmail(email: string, excludeId?: number): Promise<void> {
   const conditions = excludeId
@@ -46,7 +46,7 @@ function buildListFilters(query: ReturnType<typeof listStudentsQuerySchema.parse
   return conditions.length > 0 ? and(...conditions) : undefined;
 }
 
-export async function listStudents(req: Request, res: Response): Promise<void> {
+export async function listStudents(req: AppRequest, res: AppResponse): Promise<void> {
   const query = listStudentsQuerySchema.parse(req.query);
   const where = buildListFilters(query);
   const offset = (query.page - 1) * query.limit;
@@ -71,7 +71,7 @@ export async function listStudents(req: Request, res: Response): Promise<void> {
   });
 }
 
-export async function getFilterOptions(_req: Request, res: Response): Promise<void> {
+export async function getFilterOptions(_req: AppRequest, res: AppResponse): Promise<void> {
   const courseRows = await db
     .selectDistinct({ course: students.course })
     .from(students)
@@ -92,7 +92,7 @@ export async function getFilterOptions(_req: Request, res: Response): Promise<vo
   });
 }
 
-export async function createStudent(req: Request, res: Response): Promise<void> {
+export async function createStudent(req: AppRequest, res: AppResponse): Promise<void> {
   const input = createStudentSchema.parse(req.body);
   await assertUniqueEmail(input.email);
 
@@ -127,7 +127,7 @@ export async function createStudent(req: Request, res: Response): Promise<void> 
   });
 }
 
-export async function getStudent(req: Request, res: Response): Promise<void> {
+export async function getStudent(req: AppRequest, res: AppResponse): Promise<void> {
   const studentId = parseStudentId(req.params.id);
 
   const [student] = await db
@@ -147,7 +147,7 @@ export async function getStudent(req: Request, res: Response): Promise<void> {
   });
 }
 
-export async function updateStudent(req: Request, res: Response): Promise<void> {
+export async function updateStudent(req: AppRequest, res: AppResponse): Promise<void> {
   const studentId = parseStudentId(req.params.id);
   const input = updateStudentSchema.parse(req.body);
 
@@ -198,7 +198,7 @@ export async function updateStudent(req: Request, res: Response): Promise<void> 
   });
 }
 
-export async function deleteStudent(req: Request, res: Response): Promise<void> {
+export async function deleteStudent(req: AppRequest, res: AppResponse): Promise<void> {
   const studentId = parseStudentId(req.params.id);
 
   const [existing] = await db

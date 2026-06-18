@@ -1,13 +1,12 @@
-import { Router, type NextFunction, type Request, type Response } from 'express';
+import { Router } from 'express';
 import { listLogs } from '../handlers/logs';
 import { requireAuth } from '../middleware/auth';
+import { toRequestHandler } from '../lib/http';
 
 const router = Router();
 
 router.use(requireAuth);
 
-router.get('/', (req: Request, res: Response, next: NextFunction) => {
-  listLogs(req, res).catch(next);
-});
+router.get('/', toRequestHandler(listLogs));
 
 export default router;

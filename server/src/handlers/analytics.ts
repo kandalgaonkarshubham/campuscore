@@ -1,9 +1,9 @@
 import { count } from 'drizzle-orm';
-import type { Request, Response } from 'express';
 import { db } from '../db';
 import { students } from '../db/schema';
+import type { AppRequest, AppResponse } from '../types/http';
 
-export async function getOverview(_req: Request, res: Response): Promise<void> {
+export async function getOverview(_req: AppRequest, res: AppResponse): Promise<void> {
   const [totalResult] = await db.select({ total: count() }).from(students);
   const totalStudents = totalResult?.total ?? 0;
 

@@ -1,9 +1,9 @@
-import type { NextFunction, Request, Response } from 'express';
 import { env } from '../config/env';
 import { AppError } from '../lib/AppError';
 import { verifyToken } from '../lib/jwt';
+import type { AppRequest, AppResponse, NextFn } from '../types/http';
 
-export function requireAuth(req: Request, _res: Response, next: NextFunction): void {
+export function requireAuth(req: AppRequest, _res: AppResponse, next: NextFn): void {
   const token = req.cookies?.[env.COOKIE_NAME];
 
   if (!token) {

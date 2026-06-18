@@ -1,9 +1,8 @@
-import type { NextFunction, Request, Response } from 'express';
 import multer from 'multer';
 import { ZodError } from 'zod';
 import { env } from '../config/env';
 import { AppError } from '../lib/AppError';
-import type { JsonResponse } from '../types/http';
+import type { AppRequest, AppResponse, NextFn } from '../types/http';
 
 function isUniqueViolation(error: unknown): boolean {
   return (
@@ -16,14 +15,12 @@ function isUniqueViolation(error: unknown): boolean {
 
 export function handleErrors(
   err: unknown,
-  _req: Request,
-  res: Response,
-  _next: NextFunction,
+  _req: AppRequest,
+  res: AppResponse,
+  _next: NextFn,
 ): void {
-  const response = res as unknown as JsonResponse;
-
   if (err instanceof AppError) {
-    response.status(err.statusCode).json({
+    res.status(err.statusCode).json({
       success: false,
       message: err.message,
     });
@@ -35,17 +32,17 @@ export function handleErrors(
       err.code === 'LIMIT_FILE_SIZE'
         ? `File too large. Maximum size is ${env.MAX_FILE_SIZE_MB}MB`
         : err.message;
-    response.status(400).json({ success: false, message });
+    res.status(400).json({ success: false, message });
     return;
   }
 
   if (err instanceof Error && err.message === 'Only JPEG, PNG, and WebP images are allowed') {
-    response.status(400).json({ success: false, message: err.message });
+    res.status(400).json({ success: false, message: err.message });
     return;
   }
 
   if (err instanceof ZodError) {
-    response.status(400).json({
+    res.status(400).json({
       success: false,
       message: 'Validation failed',
       errors: err.flatten().fieldErrors,
@@ -54,7 +51,7 @@ export function handleErrors(
   }
 
   if (isUniqueViolation(err)) {
-    response.status(409).json({
+    res.status(409).json({
       success: false,
       message: 'A record with this value already exists',
     });
@@ -63,7 +60,7 @@ export function handleErrors(
 
   console.error(err);
 
-  response.status(500).json({
+  res.status(500).json({
     success: false,
     message: env.NODE_ENV === 'production' ? 'Internal server error' : String(err),
   });
