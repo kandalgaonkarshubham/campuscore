@@ -4,6 +4,17 @@ Student management app — login, CRUD, photo uploads, search/filter, dashboard 
 
 Monorepo: `client/` (React + Vite) and `server/` (Express + Drizzle + Postgres).
 
+## Hosted
+
+```text
+Frontend: https://campuscore-client.vercel.app
+Backend:  https://campuscore-server.vercel.app
+Database: Neon Postgres (via `DATABASE_URL`)
+Blob:     Vercel Blob (via `UPLOAD_STORAGE=vercel-blob`)
+Auth:     Cookie-based session auth
+Uploads:  Vercel Blob in production, local disk in development
+```
+
 ## Setup
 
 Needs Node 20+, pnpm, and Postgres running locally.
@@ -85,6 +96,15 @@ Deploy `client/` and `server/` as two projects.
 **Backend:** root `server`, uses `api/index.ts`. Point `DATABASE_URL` at hosted Postgres, run migrations before first deploy. Set `CLIENT_URL` to the frontend URL.
 
 For photo uploads in production, set `UPLOAD_STORAGE=vercel-blob`, create a Blob store in the Vercel dashboard, and link it to the server project (adds `BLOB_READ_WRITE_TOKEN` automatically). Local disk uploads don't persist on serverless — that's why Blob is needed there.
+
+### Production checklist
+
+- `DATABASE_URL` points to Neon
+- `CLIENT_URL` matches `https://campuscore-client.vercel.app`
+- `VITE_API_URL` matches `https://campuscore-server.vercel.app/api`
+- `UPLOAD_STORAGE=vercel-blob`
+- `BLOB_READ_WRITE_TOKEN` is present in the server environment
+- Cookies are issued with `SameSite=None` and `Secure` in production
 
 ## Scripts
 
