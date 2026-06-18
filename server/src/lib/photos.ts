@@ -2,9 +2,15 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { del, put } from '@vercel/blob';
-import type { Request } from 'express';
 import { env } from '../config/env';
-import { getUploadDir, toPhotoUrl } from '../utils/photo';
+
+function getUploadDir(): string {
+  return path.resolve(process.cwd(), env.UPLOAD_DIR);
+}
+
+function toLocalPhotoPath(filename: string): string {
+  return `/uploads/${filename}`;
+}
 
 function generateFilename(originalname: string): string {
   const ext = path.extname(originalname).toLowerCase();
@@ -13,6 +19,10 @@ function generateFilename(originalname: string): string {
 
 function useBlobStorage(): boolean {
   return env.UPLOAD_STORAGE === 'vercel-blob';
+}
+
+export function isLocalUploadStorage(): boolean {
+  return !useBlobStorage();
 }
 
 export async function storeUploadedPhoto(file: Express.Multer.File): Promise<string> {
@@ -34,7 +44,7 @@ export async function storeUploadedPhoto(file: Express.Multer.File): Promise<str
   }
 
   fs.writeFileSync(path.join(uploadDir, filename), file.buffer);
-  return toPhotoUrl(filename);
+  return toLocalPhotoPath(filename);
 }
 
 export async function removeStoredPhoto(photoUrl: string | null): Promise<void> {
@@ -59,8 +69,4 @@ export async function removeStoredPhoto(photoUrl: string | null): Promise<void> 
   } catch (err) {
     console.error('Failed to delete local photo:', err);
   }
-}
-
-export function isLocalUploadStorage(): boolean {
-  return !useBlobStorage();
 }

@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useAuth } from '../contexts/AuthContext';
 import { getErrorMessage } from '../lib/errors';
-import { loginSchema, type LoginFormData } from '../schemas/auth.schema';
+import { loginSchema, type LoginFormData } from '../validators/auth';
 
 export default function LoginPage() {
   const { user, isLoading, login } = useAuth();
@@ -54,7 +54,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-2xl font-bold text-slate-900">ScholarDesk</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Compuscore</h1>
         <p className="mt-1 text-sm text-slate-500">Sign in to manage students</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">

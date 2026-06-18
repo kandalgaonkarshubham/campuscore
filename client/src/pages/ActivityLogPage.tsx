@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import AppLayout from '../components/AppLayout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Pagination from '../components/Pagination';
-import type { ActivityLog } from '../services/activityLog.service';
-import { listActivityLogs } from '../services/activityLog.service';
-import type { PaginationMeta } from '../services/student.service';
+import type { ActivityLog } from '../api/logs';
+import { listLogs } from '../api/logs';
+import type { PaginationMeta } from '../validators/student';
 
 const ACTION_STYLES: Record<ActivityLog['action'], string> = {
   CREATED: 'bg-green-100 text-green-800',
@@ -28,7 +28,7 @@ export default function ActivityLogPage() {
     setIsLoading(true);
     setError('');
 
-    listActivityLogs({ page, limit: 20 })
+    listLogs({ page, limit: 20 })
       .then((result) => {
         setLogs(result.data);
         setPagination(result.pagination);

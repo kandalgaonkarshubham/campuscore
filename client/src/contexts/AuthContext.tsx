@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import api, { setUnauthorizedHandler } from '../services/api';
+import api, { setUnauthorizedHandler } from '../api/client';
 
 interface User {
   username: string;
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     await api.post('/auth/logout');
     clearAuth();
-    toast.success('Logged out successfully');
+    toast.success('Logged out');
     navigate('/login', { replace: true });
   }, [clearAuth, navigate]);
 

@@ -1,7 +1,7 @@
 {
   "name": "compuscore",
   "version": "1.0.0",
-  "description": "ScholarDesk monorepo root",
+  "description": "Compuscore — student management system",
   "private": true,
   "scripts": {
     "dev": "concurrently --names \"CLIENT,SERVER\" --prefix-colors \"cyan.bold,magenta.bold\" --prefix \"[{name}]\" --timestamp-format \"HH:mm:ss\" --kill-others-on-fail \"pnpm --filter client dev\" \"pnpm --filter server dev\"",

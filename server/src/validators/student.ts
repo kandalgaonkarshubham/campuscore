@@ -21,9 +21,6 @@ export const createStudentSchema = z.object({
 
 export const updateStudentSchema = createStudentSchema;
 
-export type CreateStudentInput = z.infer<typeof createStudentSchema>;
-export type UpdateStudentInput = z.infer<typeof updateStudentSchema>;
-
 export function parseDob(value: string): Date {
   return new Date(`${value}T00:00:00.000Z`);
 }

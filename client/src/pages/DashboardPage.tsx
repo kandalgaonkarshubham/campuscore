@@ -13,8 +13,8 @@ import {
 } from 'recharts';
 import AppLayout from '../components/AppLayout';
 import LoadingSpinner from '../components/LoadingSpinner';
-import type { AnalyticsOverview } from '../services/analytics.service';
-import { getAnalyticsOverview } from '../services/analytics.service';
+import type { AnalyticsOverview } from '../api/analytics';
+import { getOverview } from '../api/analytics';
 
 const GENDER_COLORS = {
   male: '#3b82f6',
@@ -34,7 +34,7 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    getAnalyticsOverview()
+    getOverview()
       .then(setOverview)
       .catch(() => setError('Failed to load analytics'))
       .finally(() => setIsLoading(false));

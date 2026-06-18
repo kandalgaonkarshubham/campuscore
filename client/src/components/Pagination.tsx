@@ -1,4 +1,4 @@
-import type { PaginationMeta } from '../services/student.service';
+import type { PaginationMeta } from '../validators/student';
 
 interface PaginationProps {
   pagination: PaginationMeta;

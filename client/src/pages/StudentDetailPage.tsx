@@ -6,8 +6,8 @@ import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { getErrorMessage } from '../lib/errors';
 import { resolveUploadUrl } from '../lib/urls';
-import type { Student } from '../schemas/student.schema';
-import { deleteStudent, getStudent } from '../services/student.service';
+import type { Student } from '../validators/student';
+import { deleteStudent, getStudent } from '../api/students';
 
 function formatGender(gender: string): string {
   return gender.charAt(0).toUpperCase() + gender.slice(1);
@@ -42,7 +42,7 @@ export default function StudentDetailPage() {
     setIsDeleting(true);
     try {
       await deleteStudent(student.id);
-      toast.success('Student deleted successfully');
+      toast.success('Student deleted');
       navigate('/students', { replace: true });
     } catch (error) {
       setError(getErrorMessage(error, 'Failed to delete student'));

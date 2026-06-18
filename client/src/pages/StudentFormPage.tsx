@@ -4,12 +4,12 @@ import { toast } from 'sonner';
 import AppLayout from '../components/AppLayout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import StudentForm from '../components/StudentForm';
-import type { StudentFormData } from '../schemas/student.schema';
+import type { StudentFormData } from '../validators/student';
 import {
   createStudent,
   getStudent,
   updateStudent,
-} from '../services/student.service';
+} from '../api/students';
 
 export default function StudentFormPage() {
   const { id } = useParams();
@@ -38,13 +38,13 @@ export default function StudentFormPage() {
   const handleSubmit = async (data: StudentFormData, photo?: File) => {
     if (isEdit && id) {
       const updated = await updateStudent(Number(id), data, photo);
-      toast.success('Student updated successfully');
+      toast.success('Student updated');
       navigate(`/students/${updated.id}`);
       return;
     }
 
     const created = await createStudent(data, photo);
-    toast.success('Student created successfully');
+    toast.success('Student created');
     navigate(`/students/${created.id}`);
   };
 

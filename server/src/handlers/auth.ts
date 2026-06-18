@@ -4,10 +4,10 @@ import type { Request, Response } from 'express';
 import { env } from '../config/env';
 import { db } from '../db';
 import { adminUsers } from '../db/schema';
-import { loginSchema } from '../schemas/auth.schema';
-import { AppError } from '../utils/AppError';
-import { authCookieOptions } from '../utils/cookies';
-import { signToken } from '../utils/jwt';
+import { AppError } from '../lib/AppError';
+import { authCookieOptions } from '../lib/cookies';
+import { signToken } from '../lib/jwt';
+import { loginSchema } from '../validators/auth';
 
 export async function login(req: Request, res: Response): Promise<void> {
   const { username, password } = loginSchema.parse(req.body);
@@ -28,12 +28,11 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 
   const token = signToken({ sub: admin.id, username: admin.username });
-
   res.cookie(env.COOKIE_NAME, token, authCookieOptions());
 
   res.json({
     success: true,
-    message: 'Login successful',
+    message: 'Logged in',
     data: { username: admin.username },
   });
 }
@@ -44,7 +43,7 @@ export function logout(_req: Request, res: Response): void {
 
   res.json({
     success: true,
-    message: 'Logged out successfully',
+    message: 'Logged out',
   });
 }
 
@@ -55,7 +54,7 @@ export function me(req: Request, res: Response): void {
 
   res.json({
     success: true,
-    message: 'Authenticated',
+    message: 'OK',
     data: { username: req.user.username },
   });
 }

@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { db } from '../db';
 import { students } from '../db/schema';
 
-export async function getAnalyticsOverview(_req: Request, res: Response): Promise<void> {
+export async function getOverview(_req: Request, res: Response): Promise<void> {
   const [totalResult] = await db.select({ total: count() }).from(students);
   const totalStudents = totalResult?.total ?? 0;
 
@@ -27,7 +27,7 @@ export async function getAnalyticsOverview(_req: Request, res: Response): Promis
 
   res.json({
     success: true,
-    message: 'Analytics overview fetched successfully',
+    message: 'OK',
     data: {
       totalStudents,
       genderRatio,

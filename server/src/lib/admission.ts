@@ -28,7 +28,6 @@ export async function generateAdmissionNumber(db: Db): Promise<string> {
       }
     }
 
-    const admissionNumber = `${prefix}${String(sequence).padStart(4, '0')}`;
-    return admissionNumber;
+    return `${prefix}${String(sequence).padStart(4, '0')}`;
   });
 }

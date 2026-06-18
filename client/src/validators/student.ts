@@ -36,3 +36,10 @@ export interface Student {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}

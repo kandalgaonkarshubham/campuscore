@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { resolveUploadUrl } from '../lib/urls';
-import type { Student } from '../schemas/student.schema';
+import type { Student } from '../validators/student';
 
 interface StudentTableProps {
   students: Student[];

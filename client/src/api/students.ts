@@ -1,5 +1,5 @@
-import type { Student, StudentFormData } from '../schemas/student.schema';
-import api from './api';
+import type { PaginationMeta, Student, StudentFormData } from '../validators/student';
+import api from './client';
 
 export interface StudentListParams {
   page?: number;
@@ -10,19 +10,12 @@ export interface StudentListParams {
   gender?: string;
 }
 
-export interface PaginationMeta {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-
 export interface StudentListResponse {
   data: Student[];
   pagination: PaginationMeta;
 }
 
-export interface StudentsMeta {
+export interface FilterOptions {
   courses: string[];
   years: number[];
 }
@@ -49,7 +42,7 @@ export async function listStudents(params: StudentListParams): Promise<StudentLi
   };
 }
 
-export async function getStudentsMeta(): Promise<StudentsMeta> {
+export async function getFilterOptions(): Promise<FilterOptions> {
   const res = await api.get('/students/meta');
   return res.data.data;
 }
@@ -80,3 +73,5 @@ export async function updateStudent(
 export async function deleteStudent(id: number): Promise<void> {
   await api.delete(`/students/${id}`);
 }
+
+export type { PaginationMeta };

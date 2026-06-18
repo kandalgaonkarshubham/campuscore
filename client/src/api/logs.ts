@@ -1,5 +1,5 @@
-import api from './api';
-import type { PaginationMeta } from './student.service';
+import type { PaginationMeta } from '../validators/student';
+import api from './client';
 
 export interface ActivityLog {
   id: number;
@@ -11,15 +11,15 @@ export interface ActivityLog {
   createdAt: string;
 }
 
-export interface ActivityLogListResponse {
+export interface LogListResponse {
   data: ActivityLog[];
   pagination: PaginationMeta;
 }
 
-export async function listActivityLogs(params: {
+export async function listLogs(params: {
   page?: number;
   limit?: number;
-}): Promise<ActivityLogListResponse> {
+}): Promise<LogListResponse> {
   const res = await api.get('/activity-logs', { params });
   return {
     data: res.data.data,

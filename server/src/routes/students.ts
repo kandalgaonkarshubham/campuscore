@@ -3,23 +3,21 @@ import type { NextFunction, Request, Response } from 'express';
 import {
   createStudent,
   deleteStudent,
+  getFilterOptions,
   getStudent,
-  getStudentsMeta,
   listStudents,
   updateStudent,
-} from '../controllers/student.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { uploadPhoto } from '../middleware/upload.middleware';
+} from '../handlers/students';
+import { requireAuth } from '../middleware/auth';
+import { upload } from '../middleware/upload';
 
 const router = Router();
 
-router.use(authMiddleware);
+router.use(requireAuth);
 
-function withOptionalPhoto(
-  handler: (req: Request, res: Response) => Promise<void>,
-) {
+function withUpload(handler: (req: Request, res: Response) => Promise<void>) {
   return (req: Request, res: Response, next: NextFunction) => {
-    uploadPhoto(req, res, (err) => {
+    upload(req, res, (err) => {
       if (err) {
         next(err);
         return;
@@ -29,9 +27,9 @@ function withOptionalPhoto(
   };
 }
 
-router.post('/', withOptionalPhoto(createStudent));
+router.post('/', withUpload(createStudent));
 router.get('/meta', (req, res, next) => {
-  getStudentsMeta(req, res).catch(next);
+  getFilterOptions(req, res).catch(next);
 });
 router.get('/', (req, res, next) => {
   listStudents(req, res).catch(next);
@@ -39,7 +37,7 @@ router.get('/', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
   getStudent(req, res).catch(next);
 });
-router.put('/:id', withOptionalPhoto(updateStudent));
+router.put('/:id', withUpload(updateStudent));
 router.delete('/:id', (req, res, next) => {
   deleteStudent(req, res).catch(next);
 });

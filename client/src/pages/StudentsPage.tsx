@@ -6,9 +6,8 @@ import Pagination from '../components/Pagination';
 import SearchFilterBar, { type StudentFilters } from '../components/SearchFilterBar';
 import StudentTable from '../components/StudentTable';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
-import type { Student } from '../schemas/student.schema';
-import type { PaginationMeta } from '../services/student.service';
-import { getStudentsMeta, listStudents } from '../services/student.service';
+import type { Student, PaginationMeta } from '../validators/student';
+import { getFilterOptions, listStudents } from '../api/students';
 
 const EMPTY_FILTERS: StudentFilters = {
   search: '',
@@ -37,7 +36,7 @@ export default function StudentsPage() {
   const debouncedSearch = useDebouncedValue(filters.search, 300);
 
   useEffect(() => {
-    getStudentsMeta()
+    getFilterOptions()
       .then((meta) => {
         setCourses(meta.courses);
         setYears(meta.years);

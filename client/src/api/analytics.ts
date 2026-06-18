@@ -1,4 +1,4 @@
-import api from './api';
+import api from './client';
 
 export interface GenderRatio {
   male: number;
@@ -17,7 +17,7 @@ export interface AnalyticsOverview {
   courseWiseCount: CourseCount[];
 }
 
-export async function getAnalyticsOverview(): Promise<AnalyticsOverview> {
+export async function getOverview(): Promise<AnalyticsOverview> {
   const res = await api.get('/analytics/overview');
   return res.data.data;
 }

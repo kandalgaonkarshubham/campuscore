@@ -12,8 +12,7 @@ function imageFileFilter(_req: Request, file: Express.Multer.File, cb: FileFilte
   cb(new Error('Only JPEG, PNG, and WebP images are allowed'));
 }
 
-// Memory storage so the same upload flow works for local disk and Vercel Blob.
-export const uploadPhoto = multer({
+export const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: env.MAX_FILE_SIZE_MB * 1024 * 1024 },
   fileFilter: imageFileFilter,

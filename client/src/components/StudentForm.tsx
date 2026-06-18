@@ -3,7 +3,7 @@ import { useEffect, useState, type ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { getErrorMessage } from '../lib/errors';
 import { resolveUploadUrl } from '../lib/urls';
-import { studentSchema, type Student, type StudentFormData } from '../schemas/student.schema';
+import { studentSchema, type Student, type StudentFormData } from '../validators/student';
 
 const MAX_FILE_SIZE_MB = 5;
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);

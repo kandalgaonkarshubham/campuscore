@@ -8,5 +8,3 @@ export const listStudentsQuerySchema = z.object({
   year: z.coerce.number().int().optional(),
   gender: z.enum(['male', 'female', 'other']).optional(),
 });
-
-export type ListStudentsQuery = z.infer<typeof listStudentsQuerySchema>;

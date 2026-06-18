@@ -2,17 +2,17 @@ import { and, count, desc, eq, ilike, ne, type SQL } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db } from '../db';
 import { students } from '../db/schema';
+import { logActivity } from '../lib/activity';
+import { generateAdmissionNumber } from '../lib/admission';
+import { AppError } from '../lib/AppError';
+import { formatStudent, getChangedFields, studentSnapshot } from '../lib/format-student';
+import { removeStoredPhoto, storeUploadedPhoto } from '../lib/photos';
 import {
   createStudentSchema,
   parseDob,
   updateStudentSchema,
-} from '../schemas/student.schema';
-import { listStudentsQuerySchema } from '../schemas/studentList.schema';
-import { logActivity } from '../services/activityLog.service';
-import { generateAdmissionNumber } from '../services/admissionNumber.service';
-import { removeStoredPhoto, storeUploadedPhoto } from '../services/photoStorage.service';
-import { AppError } from '../utils/AppError';
-import { formatStudent, getChangedFields, studentSnapshot } from '../utils/student';
+} from '../validators/student';
+import { listStudentsQuerySchema } from '../validators/students-query';
 
 async function assertUniqueEmail(email: string, excludeId?: number): Promise<void> {
   const conditions = excludeId
@@ -38,18 +38,10 @@ function parseStudentId(id: string | string[]): number {
 function buildListFilters(query: ReturnType<typeof listStudentsQuerySchema.parse>): SQL | undefined {
   const conditions: SQL[] = [];
 
-  if (query.search) {
-    conditions.push(ilike(students.name, `%${query.search}%`));
-  }
-  if (query.course) {
-    conditions.push(eq(students.course, query.course));
-  }
-  if (query.year !== undefined) {
-    conditions.push(eq(students.year, query.year));
-  }
-  if (query.gender) {
-    conditions.push(eq(students.gender, query.gender));
-  }
+  if (query.search) conditions.push(ilike(students.name, `%${query.search}%`));
+  if (query.course) conditions.push(eq(students.course, query.course));
+  if (query.year !== undefined) conditions.push(eq(students.year, query.year));
+  if (query.gender) conditions.push(eq(students.gender, query.gender));
 
   return conditions.length > 0 ? and(...conditions) : undefined;
 }
@@ -59,11 +51,7 @@ export async function listStudents(req: Request, res: Response): Promise<void> {
   const where = buildListFilters(query);
   const offset = (query.page - 1) * query.limit;
 
-  const [countResult] = await db
-    .select({ total: count() })
-    .from(students)
-    .where(where);
-
+  const [countResult] = await db.select({ total: count() }).from(students).where(where);
   const total = countResult?.total ?? 0;
   const totalPages = total === 0 ? 0 : Math.ceil(total / query.limit);
 
@@ -77,18 +65,13 @@ export async function listStudents(req: Request, res: Response): Promise<void> {
 
   res.json({
     success: true,
-    message: 'Students fetched successfully',
+    message: 'OK',
     data: rows.map(formatStudent),
-    pagination: {
-      page: query.page,
-      limit: query.limit,
-      total,
-      totalPages,
-    },
+    pagination: { page: query.page, limit: query.limit, total, totalPages },
   });
 }
 
-export async function getStudentsMeta(_req: Request, res: Response): Promise<void> {
+export async function getFilterOptions(_req: Request, res: Response): Promise<void> {
   const courseRows = await db
     .selectDistinct({ course: students.course })
     .from(students)
@@ -101,7 +84,7 @@ export async function getStudentsMeta(_req: Request, res: Response): Promise<voi
 
   res.json({
     success: true,
-    message: 'Student filters fetched successfully',
+    message: 'OK',
     data: {
       courses: courseRows.map((row) => row.course),
       years: yearRows.map((row) => row.year),
@@ -139,7 +122,7 @@ export async function createStudent(req: Request, res: Response): Promise<void> 
 
   res.status(201).json({
     success: true,
-    message: 'Student created successfully',
+    message: 'Student created',
     data: formatStudent(student),
   });
 }
@@ -159,7 +142,7 @@ export async function getStudent(req: Request, res: Response): Promise<void> {
 
   res.json({
     success: true,
-    message: 'Student fetched successfully',
+    message: 'OK',
     data: formatStudent(student),
   });
 }
@@ -210,7 +193,7 @@ export async function updateStudent(req: Request, res: Response): Promise<void> 
 
   res.json({
     success: true,
-    message: 'Student updated successfully',
+    message: 'Student updated',
     data: formatStudent(updated),
   });
 }

@@ -47,10 +47,7 @@ const TRACKED_FIELDS = [
   'photoUrl',
 ] as const;
 
-export function getChangedFields(
-  before: StudentRow,
-  after: StudentRow,
-): string[] {
+export function getChangedFields(before: StudentRow, after: StudentRow): string[] {
   const changed: string[] = [];
 
   for (const field of TRACKED_FIELDS) {

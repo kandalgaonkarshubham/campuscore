@@ -5,9 +5,9 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { env } from './config/env';
-import { errorHandler } from './middleware/errorHandler';
+import { isLocalUploadStorage } from './lib/photos';
+import { handleErrors } from './middleware/errors';
 import routes from './routes';
-import { isLocalUploadStorage } from './services/photoStorage.service';
 
 const app = express();
 
@@ -30,6 +30,6 @@ app.use(express.json());
 
 app.use('/api', routes);
 
-app.use(errorHandler);
+app.use(handleErrors);
 
 export default app;

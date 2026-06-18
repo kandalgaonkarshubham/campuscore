@@ -1,10 +1,15 @@
 import { count, desc } from 'drizzle-orm';
 import type { Request, Response } from 'express';
+import { z } from 'zod';
 import { db } from '../db';
 import { activityLogs } from '../db/schema';
-import { listActivityLogsQuerySchema } from '../schemas/activityLog.schema';
 
-function formatActivityLog(log: typeof activityLogs.$inferSelect) {
+const listQuery = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+function formatLog(log: typeof activityLogs.$inferSelect) {
   const details = log.details ?? {};
   const snapshot = details.snapshot as Record<string, unknown> | undefined;
   const changedFields = Array.isArray(details.changedFields) ? details.changedFields : [];
@@ -21,8 +26,8 @@ function formatActivityLog(log: typeof activityLogs.$inferSelect) {
   };
 }
 
-export async function listActivityLogs(req: Request, res: Response): Promise<void> {
-  const query = listActivityLogsQuerySchema.parse(req.query);
+export async function listLogs(req: Request, res: Response): Promise<void> {
+  const query = listQuery.parse(req.query);
   const offset = (query.page - 1) * query.limit;
 
   const [countResult] = await db.select({ total: count() }).from(activityLogs);
@@ -38,8 +43,8 @@ export async function listActivityLogs(req: Request, res: Response): Promise<voi
 
   res.json({
     success: true,
-    message: 'Activity logs fetched successfully',
-    data: rows.map(formatActivityLog),
+    message: 'OK',
+    data: rows.map(formatLog),
     pagination: {
       page: query.page,
       limit: query.limit,

@@ -1,9 +1,9 @@
 import type { NextFunction, Request, Response } from 'express';
 import { env } from '../config/env';
-import { AppError } from '../utils/AppError';
-import { verifyToken } from '../utils/jwt';
+import { AppError } from '../lib/AppError';
+import { verifyToken } from '../lib/jwt';
 
-export function authMiddleware(req: Request, _res: Response, next: NextFunction): void {
+export function requireAuth(req: Request, _res: Response, next: NextFunction): void {
   const token = req.cookies?.[env.COOKIE_NAME];
 
   if (!token) {

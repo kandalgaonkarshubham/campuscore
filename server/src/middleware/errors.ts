@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import multer from 'multer';
 import { ZodError } from 'zod';
 import { env } from '../config/env';
-import { AppError } from '../utils/AppError';
+import { AppError } from '../lib/AppError';
 
 function isUniqueViolation(error: unknown): boolean {
   return (
@@ -13,7 +13,7 @@ function isUniqueViolation(error: unknown): boolean {
   );
 }
 
-export function errorHandler(
+export function handleErrors(
   err: unknown,
   _req: Request,
   res: Response,
