@@ -12,6 +12,7 @@ import {
   YAxis,
 } from 'recharts';
 import AppLayout from '../components/AppLayout';
+import LoadingSpinner from '../components/LoadingSpinner';
 import type { AnalyticsOverview } from '../services/analytics.service';
 import { getAnalyticsOverview } from '../services/analytics.service';
 
@@ -62,7 +63,7 @@ export default function DashboardPage() {
 
         {isLoading && (
           <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-            <p className="text-sm text-slate-500">Loading analytics...</p>
+            <LoadingSpinner className="py-8" />
           </div>
         )}
 

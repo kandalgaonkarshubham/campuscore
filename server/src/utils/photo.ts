@@ -10,15 +10,11 @@ export function toPhotoUrl(filename: string): string {
   return `/uploads/${filename}`;
 }
 
-export function photoPathFromUrl(photoUrl: string | null): string | null {
-  if (!photoUrl) return null;
-  const filename = path.basename(photoUrl);
-  return path.join(getUploadDir(), filename);
-}
+export function deleteLocalPhotoFile(photoUrl: string | null): void {
+  if (!photoUrl || photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) return;
 
-export function deletePhotoFile(photoUrl: string | null): void {
-  const filePath = photoPathFromUrl(photoUrl);
-  if (!filePath || !fs.existsSync(filePath)) return;
+  const filePath = path.join(getUploadDir(), path.basename(photoUrl));
+  if (!fs.existsSync(filePath)) return;
 
   try {
     fs.unlinkSync(filePath);

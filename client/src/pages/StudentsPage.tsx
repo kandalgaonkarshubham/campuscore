@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
+import LoadingSpinner from '../components/LoadingSpinner';
 import Pagination from '../components/Pagination';
 import SearchFilterBar, { type StudentFilters } from '../components/SearchFilterBar';
 import StudentTable from '../components/StudentTable';
@@ -98,7 +99,7 @@ export default function StudentsPage() {
           />
 
           <div className="mt-6">
-            {isLoading && <p className="text-sm text-slate-500">Loading students...</p>}
+            {isLoading && <LoadingSpinner className="py-12" />}
             {error && <p className="text-sm text-red-600">{error}</p>}
             {!isLoading && !error && <StudentTable students={students} />}
           </div>

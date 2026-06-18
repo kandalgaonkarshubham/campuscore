@@ -2,21 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { useAuth } from '../contexts/AuthContext';
+import { getErrorMessage } from '../lib/errors';
 import { loginSchema, type LoginFormData } from '../schemas/auth.schema';
-
-function getErrorMessage(error: unknown): string {
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'response' in error &&
-    typeof (error as { response?: { data?: { message?: string } } }).response?.data?.message ===
-      'string'
-  ) {
-    return (error as { response: { data: { message: string } } }).response.data.message;
-  }
-  return 'Login failed. Please try again.';
-}
 
 export default function LoginPage() {
   const { user, isLoading, login } = useAuth();
@@ -41,7 +31,7 @@ export default function LoginPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <p className="text-sm text-slate-500">Loading...</p>
+        <LoadingSpinner />
       </div>
     );
   }
@@ -54,9 +44,10 @@ export default function LoginPage() {
     setServerError('');
     try {
       await login(data.username, data.password);
+      toast.success('Welcome back!');
       navigate('/dashboard', { replace: true });
     } catch (error) {
-      setServerError(getErrorMessage(error));
+      setServerError(getErrorMessage(error, 'Login failed. Please try again.'));
     }
   };
 

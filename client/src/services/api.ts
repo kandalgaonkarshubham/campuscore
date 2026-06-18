@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { toast } from 'sonner';
+import { getErrorMessage } from '../lib/errors';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -16,10 +18,16 @@ api.interceptors.response.use(
   (error) => {
     const url = error.config?.url ?? '';
     const isAuthEndpoint = url.includes('/auth/me') || url.includes('/auth/login');
+    const status = error.response?.status;
 
-    if (error.response?.status === 401 && onUnauthorized && !isAuthEndpoint) {
+    if (status === 401 && onUnauthorized && !isAuthEndpoint) {
       onUnauthorized();
+    } else if (!error.response) {
+      toast.error('Network error. Please check your connection.');
+    } else if (status && status >= 500) {
+      toast.error(getErrorMessage(error, 'Server error. Please try again.'));
     }
+
     return Promise.reject(error);
   },
 );

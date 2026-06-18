@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import AppLayout from '../components/AppLayout';
+import LoadingSpinner from '../components/LoadingSpinner';
 import StudentForm from '../components/StudentForm';
 import type { StudentFormData } from '../schemas/student.schema';
 import {
@@ -36,11 +38,13 @@ export default function StudentFormPage() {
   const handleSubmit = async (data: StudentFormData, photo?: File) => {
     if (isEdit && id) {
       const updated = await updateStudent(Number(id), data, photo);
+      toast.success('Student updated successfully');
       navigate(`/students/${updated.id}`);
       return;
     }
 
     const created = await createStudent(data, photo);
+    toast.success('Student created successfully');
     navigate(`/students/${created.id}`);
   };
 
@@ -56,7 +60,7 @@ export default function StudentFormPage() {
           </h1>
         </div>
 
-        {isLoading && <p className="text-sm text-slate-500">Loading student...</p>}
+        {isLoading && <LoadingSpinner className="py-8" />}
         {loadError && <p className="text-sm text-red-600">{loadError}</p>}
 
         {!isLoading && !loadError && (!isEdit || student) && (

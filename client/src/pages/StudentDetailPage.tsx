@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import AppLayout from '../components/AppLayout';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { getErrorMessage } from '../lib/errors';
 import { resolveUploadUrl } from '../lib/urls';
 import type { Student } from '../schemas/student.schema';
 import { deleteStudent, getStudent } from '../services/student.service';
@@ -39,9 +42,10 @@ export default function StudentDetailPage() {
     setIsDeleting(true);
     try {
       await deleteStudent(student.id);
+      toast.success('Student deleted successfully');
       navigate('/students', { replace: true });
-    } catch {
-      setError('Failed to delete student');
+    } catch (error) {
+      setError(getErrorMessage(error, 'Failed to delete student'));
       setIsDeleting(false);
       setShowDeleteDialog(false);
     }
@@ -54,7 +58,7 @@ export default function StudentDetailPage() {
           ← Back to students
         </Link>
 
-        {isLoading && <p className="mt-4 text-sm text-slate-500">Loading...</p>}
+        {isLoading && <LoadingSpinner className="mt-8 py-8" />}
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
         {student && (

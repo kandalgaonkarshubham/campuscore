@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import api, { setUnauthorizedHandler } from '../services/api';
 
 interface User {
@@ -55,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     await api.post('/auth/logout');
     clearAuth();
+    toast.success('Logged out successfully');
     navigate('/login', { replace: true });
   }, [clearAuth, navigate]);
 

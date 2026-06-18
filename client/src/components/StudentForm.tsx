@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
+import { getErrorMessage } from '../lib/errors';
 import { resolveUploadUrl } from '../lib/urls';
 import { studentSchema, type Student, type StudentFormData } from '../schemas/student.schema';
 
@@ -11,25 +12,6 @@ interface StudentFormProps {
   initialData?: Student;
   onSubmit: (data: StudentFormData, photo?: File) => Promise<void>;
   submitLabel: string;
-}
-
-function getErrorMessage(error: unknown): string {
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'response' in error &&
-    typeof (error as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } })
-      .response?.data?.message === 'string'
-  ) {
-    const data = (error as { response: { data: { message: string; errors?: Record<string, string[]> } } })
-      .response.data;
-    if (data.errors) {
-      const firstFieldError = Object.values(data.errors).flat()[0];
-      if (firstFieldError) return firstFieldError;
-    }
-    return data.message;
-  }
-  return 'Something went wrong. Please try again.';
 }
 
 function validatePhoto(file: File): string | null {
@@ -88,7 +70,7 @@ export default function StudentForm({ initialData, onSubmit, submitLabel }: Stud
     return () => URL.revokeObjectURL(objectUrl);
   }, [photo]);
 
-  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     setPhotoError('');
 

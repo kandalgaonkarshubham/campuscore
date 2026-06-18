@@ -1,10 +1,13 @@
 import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AppLayoutProps {
   children: ReactNode;
 }
+
+const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+  `text-sm transition ${isActive ? 'font-medium text-blue-600' : 'text-slate-600 hover:text-slate-900'}`;
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const { user, logout } = useAuth();
@@ -14,15 +17,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
           <nav className="flex items-center gap-6">
-            <Link to="/dashboard" className="text-lg font-semibold text-slate-900">
+            <NavLink to="/dashboard" className="text-lg font-semibold text-slate-900">
               ScholarDesk
-            </Link>
-            <Link to="/dashboard" className="text-sm text-slate-600 hover:text-slate-900">
+            </NavLink>
+            <NavLink to="/dashboard" className={navLinkClass}>
               Dashboard
-            </Link>
-            <Link to="/students" className="text-sm text-slate-600 hover:text-slate-900">
+            </NavLink>
+            <NavLink to="/students" className={navLinkClass}>
               Students
-            </Link>
+            </NavLink>
+            <NavLink to="/activity-logs" className={navLinkClass}>
+              Activity Log
+            </NavLink>
           </nav>
           <div className="flex items-center gap-4">
             <span className="text-sm text-slate-600">{user?.username}</span>

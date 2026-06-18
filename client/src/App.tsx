@@ -1,9 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import ActivityLogPage from './pages/ActivityLogPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
-import PlaceholderPage from './pages/PlaceholderPage';
+import NotFoundPage from './pages/NotFoundPage';
 import StudentDetailPage from './pages/StudentDetailPage';
 import StudentFormPage from './pages/StudentFormPage';
 import StudentsPage from './pages/StudentsPage';
@@ -22,9 +23,10 @@ function App() {
             <Route path="/students/new" element={<StudentFormPage />} />
             <Route path="/students/:id/edit" element={<StudentFormPage />} />
             <Route path="/students/:id" element={<StudentDetailPage />} />
+            <Route path="/activity-logs" element={<ActivityLogPage />} />
           </Route>
 
-          <Route path="*" element={<PlaceholderPage title="Not Found" />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
