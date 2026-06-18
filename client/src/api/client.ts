@@ -2,9 +2,18 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { getErrorMessage } from '../lib/errors';
 
+function normalizeUrl(value: string): string {
+  return value.replace(/\/+$/, '');
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api',
+  baseURL: normalizeUrl(import.meta.env.VITE_API_URL),
   withCredentials: true,
+});
+
+api.interceptors.request.use((config) => {
+  config.withCredentials = true;
+  return config;
 });
 
 let onUnauthorized: (() => void) | null = null;
