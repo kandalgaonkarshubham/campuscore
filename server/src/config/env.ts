@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+function normalizeUrl(value: string): string {
+  return value.replace(/\/+$/, '');
+}
+
 const envSchema = z
   .object({
     PORT: z.coerce.number().default(5000),
@@ -39,4 +43,9 @@ function loadEnv(): Env {
   return result.data;
 }
 
-export const env = loadEnv();
+const loadedEnv = loadEnv();
+
+export const env = {
+  ...loadedEnv,
+  CLIENT_URL: normalizeUrl(loadedEnv.CLIENT_URL),
+};
