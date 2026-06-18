@@ -10,7 +10,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `text-sm transition ${isActive ? 'font-medium text-blue-600' : 'text-slate-600 hover:text-slate-900'}`;
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-slate-50">
