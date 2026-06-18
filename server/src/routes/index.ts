@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Request, type Response } from 'express';
 import analytics from './analytics';
 import auth from './auth';
 import logs from './logs';
@@ -6,7 +6,7 @@ import students from './students';
 
 const router = Router();
 
-router.get('/health', (_req, res) => {
+router.get('/health', (_req: Request, res: Response) => {
   res.json({
     success: true,
     message: 'OK',

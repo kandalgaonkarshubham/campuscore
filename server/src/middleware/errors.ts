@@ -3,6 +3,7 @@ import multer from 'multer';
 import { ZodError } from 'zod';
 import { env } from '../config/env';
 import { AppError } from '../lib/AppError';
+import type { JsonResponse } from '../types/http';
 
 function isUniqueViolation(error: unknown): boolean {
   return (
@@ -19,8 +20,10 @@ export function handleErrors(
   res: Response,
   _next: NextFunction,
 ): void {
+  const response = res as unknown as JsonResponse;
+
   if (err instanceof AppError) {
-    res.status(err.statusCode).json({
+    response.status(err.statusCode).json({
       success: false,
       message: err.message,
     });
@@ -32,17 +35,17 @@ export function handleErrors(
       err.code === 'LIMIT_FILE_SIZE'
         ? `File too large. Maximum size is ${env.MAX_FILE_SIZE_MB}MB`
         : err.message;
-    res.status(400).json({ success: false, message });
+    response.status(400).json({ success: false, message });
     return;
   }
 
   if (err instanceof Error && err.message === 'Only JPEG, PNG, and WebP images are allowed') {
-    res.status(400).json({ success: false, message: err.message });
+    response.status(400).json({ success: false, message: err.message });
     return;
   }
 
   if (err instanceof ZodError) {
-    res.status(400).json({
+    response.status(400).json({
       success: false,
       message: 'Validation failed',
       errors: err.flatten().fieldErrors,
@@ -51,7 +54,7 @@ export function handleErrors(
   }
 
   if (isUniqueViolation(err)) {
-    res.status(409).json({
+    response.status(409).json({
       success: false,
       message: 'A record with this value already exists',
     });
@@ -60,7 +63,7 @@ export function handleErrors(
 
   console.error(err);
 
-  res.status(500).json({
+  response.status(500).json({
     success: false,
     message: env.NODE_ENV === 'production' ? 'Internal server error' : String(err),
   });
